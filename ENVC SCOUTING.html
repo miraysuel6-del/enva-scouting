@@ -1,0 +1,1256 @@
+import React, { useState } from 'react';
+import { Camera } from 'lucide-react';
+
+export default function VCDayForm() {
+  const [step, setStep] = useState(0);
+  const [formData, setFormData] = useState({
+    // Step 1: Temel Bilgiler
+    founderName: '',
+    email: '',
+    phone: '',
+    startupName: '',
+    website: '',
+    
+    // Step 2: Ekip Bilgileri
+    teamMembers: [
+      { name: '', university: '', department: '', year: '' }
+    ],
+    
+    // Step 3: Startup Detayları
+    problemStatement: '',
+    solution: '',
+    stage: '',
+    pitchDeck: '',
+    
+    // Step 4: Son
+    howHeard: '',
+    anythingElse: ''
+  });
+
+  const stageOptions = ['Idea', 'MVP', 'Pre-seed', 'Seed'];
+
+  const totalSteps = 5;
+
+  const handleInputChange = (field, value) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleTeamMemberChange = (index, field, value) => {
+    const updatedMembers = [...formData.teamMembers];
+    updatedMembers[index][field] = value;
+    setFormData(prev => ({ ...prev, teamMembers: updatedMembers }));
+  };
+
+  const addTeamMember = () => {
+    setFormData(prev => ({
+      ...prev,
+      teamMembers: [...prev.teamMembers, { name: '', university: '', department: '', year: '' }]
+    }));
+  };
+
+  const removeTeamMember = (index) => {
+    if (formData.teamMembers.length > 1) {
+      const updatedMembers = formData.teamMembers.filter((_, i) => i !== index);
+      setFormData(prev => ({ ...prev, teamMembers: updatedMembers }));
+    }
+  };
+
+  const nextStep = () => {
+    if (step < totalSteps - 1) setStep(step + 1);
+  };
+
+  const prevStep = () => {
+    if (step > 0) setStep(step - 1);
+  };
+
+  const handleSubmit = async () => {
+    // Form validasyonu
+    if (!formData.founderName || !formData.email || !formData.phone || !formData.startupName) {
+      alert('Lütfen tüm zorunlu alanları doldurun!');
+      return;
+    }
+
+    // Ekip üyelerini kontrol et
+    const incompleteMembers = formData.teamMembers.some(
+      member => !member.name || !member.university || !member.department || !member.year
+    );
+    
+    if (incompleteMembers) {
+      alert('Lütfen tüm ekip üyelerinin bilgilerini eksiksiz doldurun!');
+      return;
+    }
+
+    if (!formData.problemStatement || !formData.solution || !formData.stage || !formData.pitchDeck) {
+      alert('Lütfen tüm zorunlu alanları doldurun!');
+      return;
+    }
+
+    try {
+      // Google Sheets'e gönder
+      const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzXQ9cqO6qwZPHGpm1pzqWe7sz5A3cbJ2EXtxczupobloYDQt-9ms0fMbYHuiao6MMf/exec';
+      
+      const response = await fetch(GOOGLE_SCRIPT_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          timestamp: new Date().toISOString(),
+          founderName: formData.founderName,
+          email: formData.email,
+          phone: formData.phone,
+          startupName: formData.startupName,
+          website: formData.website,
+          teamMembers: formData.teamMembers,
+          problemStatement: formData.problemStatement,
+          solution: formData.solution,
+          stage: formData.stage,
+          pitchDeck: formData.pitchDeck,
+          howHeard: formData.howHeard,
+          anythingElse: formData.anythingElse
+        })
+      });
+
+      alert('Başvurunuz başarıyla gönderildi! 🚀\n\nYakında sizinle iletişime geçeceğiz.');
+      
+      // Formu sıfırla
+      window.location.reload();
+      
+    } catch (error) {
+      console.error('Hata:', error);
+      alert('Bir hata oluştu. Lütfen tekrar deneyin veya miray.ipek@std.bogazici.edu.tr adresine email gönderin.');
+    }
+  };
+
+  const renderStep = () => {
+    switch(step) {
+      case 0:
+        return (
+          <div className="step-content">
+            <div className="welcome-header">
+              <div className="floating-emojis">
+                <span className="float-emoji" style={{animationDelay: '0s'}}>🚀</span>
+                <span className="float-emoji" style={{animationDelay: '0.5s'}}>💡</span>
+                <span className="float-emoji" style={{animationDelay: '1s'}}>🎯</span>
+                <span className="float-emoji" style={{animationDelay: '1.5s'}}>💪</span>
+                <span className="float-emoji" style={{animationDelay: '2s'}}>⭐</span>
+              </div>
+              <h1 className="main-title animated-gradient">🚀 ENVC - VC Day</h1>
+              <p className="subtitle fade-in-up" style={{animationDelay: '0.2s'}}>Entrepreneur & Venture Capital Society</p>
+              
+              <div className="info-section fade-in-up" style={{animationDelay: '0.4s'}}>
+                <h3>📍 Biz Kimiz?</h3>
+                <p>Boğaziçi Üniversitesi bünyesinde kurulan <strong>ENVC</strong>, founder-VC pipeline'ını kurmayı hedefleyen bir topluluktur. Network oluşturmanın ve know-how aktarımının merkezi olmayı amaçlıyoruz.</p>
+                
+                <h3>🎯 VC Day Nedir?</h3>
+                <p>Nisan sonu - Mayıs başı tarihleri arasında gerçekleşecek <strong>VC Day</strong>, Türkiye'nin önde gelen venture capital firmalarıyla startupları bir araya getiren özel bir etkinliktir.</p>
+                
+                <h3>✨ Etkinlikte Neler Olacak?</h3>
+                <ul className="event-features">
+                  <li>🤝 Seçilen startuplar ile VC'lerin bire-bir eşleşmesi</li>
+                  <li>🎤 Pitch sunumları ve canlı feedback oturumları</li>
+                  <li>💡 Networking fırsatları</li>
+                  <li>🚀 Sektör deneyimli mentorlardan tavsiyeler</li>
+                </ul>
+                
+                <h3>🏢 Katılacak VC'ler</h3>
+                <div className="vc-list">
+                  <span className="vc-badge pop-in" style={{animationDelay: '0.6s'}}>212</span>
+                  <span className="vc-badge pop-in" style={{animationDelay: '0.7s'}}>Revo Capital</span>
+                  <span className="vc-badge pop-in" style={{animationDelay: '0.8s'}}>E2VC</span>
+                  <span className="vc-badge pop-in" style={{animationDelay: '0.9s'}}>ve daha fazlası...</span>
+                </div>
+                
+                <div className="cta-box pulse-glow">
+                  <p>💪 Startup'ını bir sonraki seviyeye taşımaya hazır mısın?</p>
+                  <p>Hadi başvurunu tamamla!</p>
+                </div>
+                
+                <div className="social-section fade-in-up" style={{animationDelay: '1s'}}>
+                  <h3>📱 Bizi Takip Edin</h3>
+                  <div className="social-links">
+                    <a href="https://www.linkedin.com/company/envc-entrepreneurship-vc-community/" target="_blank" rel="noopener noreferrer" className="social-link linkedin">
+                      <span className="social-icon">🔗</span>
+                      <span>LinkedIn</span>
+                    </a>
+                    <a href="https://www.instagram.com/envc.boun/" target="_blank" rel="noopener noreferrer" className="social-link instagram">
+                      <span className="social-icon">📸</span>
+                      <span>Instagram</span>
+                    </a>
+                  </div>
+                  <p className="social-note">Etkinlik güncellemeleri ve topluluk haberleri için bizi takip etmeyi unutmayın!</p>
+                </div>
+              </div>
+            </div>
+            <button onClick={nextStep} className="next-btn big-btn pulse">
+              Başvuruya Başla →
+            </button>
+          </div>
+        );
+
+      case 1:
+        return (
+          <div className="step-content">
+            <h2 className="step-title">Seni tanıyalım 👋</h2>
+            <div className="form-group">
+              <label>Adın Soyadın *</label>
+              <input
+                type="text"
+                value={formData.founderName}
+                onChange={(e) => handleInputChange('founderName', e.target.value)}
+                placeholder="Ahmet Yılmaz"
+                className="input-field"
+                required
+              />
+            </div>
+            <div className="form-group">
+              <label>Email *</label>
+              <input
+                type="email"
+                value={formData.email}
+                onChange={(e) => handleInputChange('email', e.target.value)}
+                placeholder="ahmet@startup.com"
+                className="input-field"
+                required
+              />
+            </div>
+            <div className="form-group">
+              <label>Telefon *</label>
+              <input
+                type="tel"
+                value={formData.phone}
+                onChange={(e) => handleInputChange('phone', e.target.value)}
+                placeholder="+90 555 123 45 67"
+                className="input-field"
+                required
+              />
+            </div>
+            <div className="form-group">
+              <label>Startup İsmi *</label>
+              <input
+                type="text"
+                value={formData.startupName}
+                onChange={(e) => handleInputChange('startupName', e.target.value)}
+                placeholder="Startup adınız"
+                className="input-field"
+                required
+              />
+            </div>
+            <div className="form-group">
+              <label>Website / LinkedIn</label>
+              <input
+                type="text"
+                value={formData.website}
+                onChange={(e) => handleInputChange('website', e.target.value)}
+                placeholder="https://startup.com"
+                className="input-field"
+              />
+            </div>
+            <div className="button-group">
+              <button onClick={prevStep} className="prev-btn">← Geri</button>
+              <button onClick={nextStep} className="next-btn">İlerle →</button>
+            </div>
+          </div>
+        );
+
+      case 2:
+        return (
+          <div className="step-content">
+            <h2 className="step-title">Ekip Bilgileri 👥</h2>
+            <p className="section-desc">Ekibinizdeki tüm üyelerin bilgilerini ekleyin</p>
+            
+            {formData.teamMembers.map((member, index) => (
+              <div key={index} className="team-member-card">
+                <div className="member-header">
+                  <h3>Ekip Üyesi {index + 1}</h3>
+                  {formData.teamMembers.length > 1 && (
+                    <button 
+                      onClick={() => removeTeamMember(index)} 
+                      className="remove-btn"
+                      type="button"
+                    >
+                      ✕ Kaldır
+                    </button>
+                  )}
+                </div>
+                
+                <div className="form-group">
+                  <label>Ad Soyad *</label>
+                  <input
+                    type="text"
+                    value={member.name}
+                    onChange={(e) => handleTeamMemberChange(index, 'name', e.target.value)}
+                    placeholder="Ahmet Yılmaz"
+                    className="input-field"
+                    required
+                  />
+                </div>
+                
+                <div className="form-row">
+                  <div className="form-group">
+                    <label>Üniversite *</label>
+                    <input
+                      type="text"
+                      value={member.university}
+                      onChange={(e) => handleTeamMemberChange(index, 'university', e.target.value)}
+                      placeholder="Boğaziçi Üniversitesi"
+                      className="input-field"
+                      required
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Bölüm *</label>
+                    <input
+                      type="text"
+                      value={member.department}
+                      onChange={(e) => handleTeamMemberChange(index, 'department', e.target.value)}
+                      placeholder="Bilgisayar Mühendisliği"
+                      className="input-field"
+                      required
+                    />
+                  </div>
+                </div>
+                
+                <div className="form-group">
+                  <label>Sınıf *</label>
+                  <select
+                    value={member.year}
+                    onChange={(e) => handleTeamMemberChange(index, 'year', e.target.value)}
+                    className="select-field"
+                    required
+                  >
+                    <option value="">Seç</option>
+                    <option value="1">1. Sınıf</option>
+                    <option value="2">2. Sınıf</option>
+                    <option value="3">3. Sınıf</option>
+                    <option value="4">4. Sınıf</option>
+                    <option value="Mezun">Mezun</option>
+                    <option value="Yüksek Lisans">Yüksek Lisans</option>
+                    <option value="Doktora">Doktora</option>
+                  </select>
+                </div>
+              </div>
+            ))}
+            
+            <button onClick={addTeamMember} className="add-member-btn" type="button">
+              + Ekip Üyesi Ekle
+            </button>
+            
+            <div className="button-group">
+              <button onClick={prevStep} className="prev-btn">← Geri</button>
+              <button onClick={nextStep} className="next-btn">İlerle →</button>
+            </div>
+          </div>
+        );
+
+      case 3:
+        return (
+          <div className="step-content">
+            <h2 className="step-title">Startup'ını anlat 💡</h2>
+            <div className="form-group">
+              <label>Hangi problemi çözüyorsun? *</label>
+              <textarea
+                value={formData.problemStatement}
+                onChange={(e) => handleInputChange('problemStatement', e.target.value)}
+                placeholder="Müşterilerin hangi sıkıntıyı yaşıyor?"
+                className="textarea-field"
+                rows="4"
+              />
+            </div>
+            <div className="form-group">
+              <label>Çözümün ne? *</label>
+              <textarea
+                value={formData.solution}
+                onChange={(e) => handleInputChange('solution', e.target.value)}
+                placeholder="Bu problemi nasıl çözüyorsunuz?"
+                className="textarea-field"
+                rows="4"
+              />
+            </div>
+            <div className="form-group">
+              <label>Hangi aşamadasınız? *</label>
+              <select
+                value={formData.stage}
+                onChange={(e) => handleInputChange('stage', e.target.value)}
+                className="select-field"
+              >
+                <option value="">Seç</option>
+                {stageOptions.map(opt => (
+                  <option key={opt} value={opt}>{opt}</option>
+                ))}
+              </select>
+            </div>
+            <div className="form-group">
+              <label>Pitch Deck Linki *</label>
+              <input
+                type="text"
+                value={formData.pitchDeck}
+                onChange={(e) => handleInputChange('pitchDeck', e.target.value)}
+                placeholder="Google Drive, Docsend, vs. link"
+                className="input-field"
+                required
+              />
+              <small className="hint-text">Pitch deck'inizi bir link olarak paylaşın (Google Drive, Docsend, vb.)</small>
+            </div>
+            <div className="button-group">
+              <button onClick={prevStep} className="prev-btn">← Geri</button>
+              <button onClick={nextStep} className="next-btn">İlerle →</button>
+            </div>
+          </div>
+        );
+
+      case 4:
+        return (
+          <div className="step-content">
+            <h2 className="step-title">Son dokunuşlar ✨</h2>
+            <div className="form-group">
+              <label>Bizi nereden duydun?</label>
+              <input
+                type="text"
+                value={formData.howHeard}
+                onChange={(e) => handleInputChange('howHeard', e.target.value)}
+                placeholder="Instagram, arkadaş, LinkedIn, vs."
+                className="input-field"
+              />
+            </div>
+            <div className="form-group">
+              <label>Eklemek istediğin bir şey var mı?</label>
+              <textarea
+                value={formData.anythingElse}
+                onChange={(e) => handleInputChange('anythingElse', e.target.value)}
+                placeholder="Buraya özel notlarını, sorularını veya eklemek istediklerini yazabilirsin..."
+                className="textarea-field"
+                rows="5"
+              />
+            </div>
+            <div className="final-note">
+              <p>🎯 Başvurunuz değerlendirildikten sonra sizinle iletişime geçeceğiz!</p>
+              <p>📧 Seçilen startuplar etkinlik öncesi bilgilendirilecek.</p>
+              <p>🚀 Başarılar diliyoruz!</p>
+            </div>
+            
+            <div className="contact-section">
+              <h3>📞 Sorularınız mı var?</h3>
+              <div className="contact-card">
+                <div className="contact-avatar">
+                  <img 
+                    src="data:image/jpeg;base64,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OkNyZWF0b3JUb29sPgogICAgICAgICA8eG1wOk1vZGlmeURhdGU+MjAyNC0xMi0xNFQyMTo0ODoxNTwveG1wOk1vZGlmeURhdGU+CiAgICAgICAgIDxtd2ctcnM6UmVnaW9ucyByZGY6cGFyc2VUeXBlPSJSZXNvdXJjZSI+CiAgICAgICAgICAgIDxtd2ctcnM6UmVnaW9uTGlzdD4KICAgICAgICAgICAgICAgPHJkZjpTZXE+CiAgICAgICAgICAgICAgICAgIDxyZGY6bGkgcmRmOnBhcnNlVHlwZT0iUmVzb3VyY2UiPgogICAgICAgICAgICAgICAgICAgICA8bXdnLXJzOkFyZWEgcmRmOnBhcnNlVHlwZT0iUmVzb3VyY2UiPgogICAgICAgICAgICAgICAgICAgICAgICA8c3RBcmVhOnk+MC40MjUwOTUyMzgwOTUyMzgwODwvc3RBcmVhOnk+CiAgICAgICAgICAgICAgICAgICAgICAgIDxzdEFyZWE6dz4wLjA2NDk1MjM4MDk1MjM4MDkyODwvc3RBcmVhOnc+CiAgICAgICAgICAgICAgICAgICAgICAgIDxzdEFyZWE6eD4wLjQzMjk1MjM4MDk1MjM4MDk4PC9zdEFyZWE6eD4KICAgICAgICAgICAgICAgICAgICAgICAgPHN0QXJlYTpoPjAuMDg2OTUyMzgwOTUyMzgwOTQ4PC9zdEFyZWE6aD4KICAgICAgICAgICAgICAgICAgICAgICAgPHN0QXJlYTp1bml0Pm5vcm1hbGl6ZWQ8L3N0QXJlYTp1bml0PgogICAgICAgICAgICAgICAgICAgICA8L213Zy1yczpBcmVhPgogICAgICAgICAgICAgICAgICAgICA8bXdnLXJzOlR5cGU+RmFjZTwvbXdnLXJzOlR5cGU+CiAgICAgICAgICAgICAgICAgICAgIDxtd2ctcnM6RXh0ZW5zaW9ucyByZGY6cGFyc2VUeXBlPSJSZXNvdXJjZSI+CiAgICAgICAgICAgICAgICAgICAgICAgIDxhcHBsZS1maTpBbmdsZUluZm9ZYXc+MDwvYXBwbGUtZmk6QW5nbGVJbmZvWWF3PgogICAgICAgICAgICAgICAgICAgICAgICA8YXBwbGUtZmk6QW5nbGVJbmZvUm9sbD4yNzA8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" 
+                    alt="Miray İpek"
+                    className="avatar-img"
+                  />
+                </div>
+                <div className="contact-info">
+                  <h4>Miray İpek</h4>
+                  <p className="contact-role">ENVC Ekibi</p>
+                  <div className="contact-links">
+                    <a href="https://www.linkedin.com/in/mirayipek/" target="_blank" rel="noopener noreferrer" className="contact-link">
+                      🔗 LinkedIn
+                    </a>
+                    <a href="mailto:miray.ipek@std.bogazici.edu.tr" className="contact-link">
+                      📧 Email
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div className="button-group">
+              <button onClick={prevStep} className="prev-btn">← Geri</button>
+              <button onClick={handleSubmit} className="submit-btn">
+                Başvuruyu Gönder 🚀
+              </button>
+            </div>
+          </div>
+        );
+
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <div className="container">
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap');
+        
+        * {
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
+        }
+
+        body {
+          font-family: 'Outfit', sans-serif;
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+          min-height: 100vh;
+          padding: 20px;
+        }
+
+        .container {
+          max-width: 700px;
+          margin: 0 auto;
+          animation: fadeIn 0.6s ease-out;
+        }
+
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        @keyframes float {
+          0%, 100% {
+            transform: translateY(0px) rotate(0deg);
+          }
+          50% {
+            transform: translateY(-20px) rotate(5deg);
+          }
+        }
+
+        @keyframes gradientShift {
+          0% {
+            background-position: 0% 50%;
+          }
+          50% {
+            background-position: 100% 50%;
+          }
+          100% {
+            background-position: 0% 50%;
+          }
+        }
+
+        @keyframes pulse {
+          0%, 100% {
+            transform: scale(1);
+          }
+          50% {
+            transform: scale(1.05);
+          }
+        }
+
+        @keyframes pulseGlow {
+          0%, 100% {
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+          }
+          50% {
+            box-shadow: 0 0 40px rgba(255, 215, 0, 0.6);
+          }
+        }
+
+        @keyframes popIn {
+          0% {
+            opacity: 0;
+            transform: scale(0.5);
+          }
+          70% {
+            transform: scale(1.1);
+          }
+          100% {
+            opacity: 1;
+            transform: scale(1);
+          }
+        }
+
+        @keyframes fadeInUp {
+          from {
+            opacity: 0;
+            transform: translateY(30px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        .floating-emojis {
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          pointer-events: none;
+          overflow: hidden;
+        }
+
+        .float-emoji {
+          position: absolute;
+          font-size: 3rem;
+          opacity: 0.15;
+          animation: float 4s ease-in-out infinite;
+        }
+
+        .float-emoji:nth-child(1) {
+          left: 10%;
+          top: 10%;
+        }
+
+        .float-emoji:nth-child(2) {
+          right: 15%;
+          top: 20%;
+        }
+
+        .float-emoji:nth-child(3) {
+          left: 70%;
+          top: 40%;
+        }
+
+        .float-emoji:nth-child(4) {
+          left: 15%;
+          top: 60%;
+        }
+
+        .float-emoji:nth-child(5) {
+          right: 10%;
+          top: 70%;
+        }
+
+        .animated-gradient {
+          background: linear-gradient(135deg, #667eea, #764ba2, #f093fb);
+          background-size: 200% 200%;
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+          animation: gradientShift 3s ease infinite;
+        }
+
+        .fade-in-up {
+          animation: fadeInUp 0.8s ease-out forwards;
+          opacity: 0;
+        }
+
+        .pop-in {
+          animation: popIn 0.6s ease-out forwards;
+          opacity: 0;
+        }
+
+        .pulse {
+          animation: pulse 2s ease-in-out infinite;
+        }
+
+        .pulse-glow {
+          animation: pulseGlow 2s ease-in-out infinite;
+        }
+
+        .progress-bar {
+          background: rgba(255, 255, 255, 0.2);
+          border-radius: 100px;
+          height: 8px;
+          margin-bottom: 40px;
+          overflow: hidden;
+          backdrop-filter: blur(10px);
+        }
+
+        .progress-fill {
+          height: 100%;
+          background: linear-gradient(90deg, #FFD700, #FFA500);
+          border-radius: 100px;
+          transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+          box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+        }
+
+        .form-card {
+          background: rgba(255, 255, 255, 0.98);
+          border-radius: 24px;
+          padding: 50px;
+          box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+          animation: slideUp 0.5s ease-out;
+        }
+
+        @keyframes slideUp {
+          from {
+            opacity: 0;
+            transform: translateY(30px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        .step-content {
+          min-height: 400px;
+        }
+
+        .welcome-header {
+          text-align: center;
+          margin-bottom: 40px;
+          position: relative;
+        }
+
+        .main-title {
+          font-size: 3.5rem;
+          font-weight: 800;
+          background: linear-gradient(135deg, #667eea, #764ba2);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+          margin-bottom: 16px;
+          line-height: 1.2;
+        }
+
+        .subtitle {
+          font-size: 1.3rem;
+          color: #4a5568;
+          font-weight: 500;
+          margin-bottom: 24px;
+        }
+
+        .info-box {
+          background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+          border-radius: 16px;
+          padding: 24px;
+          border: 2px solid rgba(102, 126, 234, 0.2);
+        }
+
+        .info-box p {
+          font-size: 1.1rem;
+          color: #2d3748;
+          margin: 8px 0;
+          font-weight: 500;
+        }
+
+        .info-section {
+          text-align: left;
+          margin-top: 32px;
+        }
+
+        .info-section h3 {
+          font-size: 1.3rem;
+          font-weight: 700;
+          color: #1a202c;
+          margin: 28px 0 12px 0;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
+
+        .info-section p {
+          font-size: 1.05rem;
+          color: #4a5568;
+          line-height: 1.7;
+          margin-bottom: 16px;
+        }
+
+        .event-features {
+          list-style: none;
+          margin: 16px 0;
+          padding: 0;
+        }
+
+        .event-features li {
+          font-size: 1.05rem;
+          color: #2d3748;
+          padding: 10px 0;
+          line-height: 1.6;
+        }
+
+        .vc-list {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 12px;
+          margin: 16px 0;
+        }
+
+        .vc-badge {
+          background: linear-gradient(135deg, #667eea, #764ba2);
+          color: white;
+          padding: 10px 20px;
+          border-radius: 20px;
+          font-weight: 600;
+          font-size: 0.95rem;
+          display: inline-block;
+        }
+
+        .cta-box {
+          background: linear-gradient(135deg, rgba(255, 215, 0, 0.15), rgba(255, 165, 0, 0.15));
+          border-radius: 16px;
+          padding: 24px;
+          margin-top: 28px;
+          border: 2px solid rgba(255, 215, 0, 0.3);
+          text-align: center;
+        }
+
+        .cta-box p {
+          font-size: 1.1rem;
+          font-weight: 600;
+          color: #1a202c;
+          margin: 8px 0;
+        }
+
+        .hint-text {
+          display: block;
+          margin-top: 8px;
+          font-size: 0.9rem;
+          color: #718096;
+          font-style: italic;
+        }
+
+        .section-desc {
+          font-size: 1.05rem;
+          color: #4a5568;
+          margin-bottom: 28px;
+          font-weight: 500;
+        }
+
+        .team-member-card {
+          background: linear-gradient(135deg, rgba(102, 126, 234, 0.05), rgba(118, 75, 162, 0.05));
+          border: 2px solid #e2e8f0;
+          border-radius: 16px;
+          padding: 24px;
+          margin-bottom: 20px;
+          transition: all 0.3s ease;
+        }
+
+        .team-member-card:hover {
+          border-color: #667eea;
+          box-shadow: 0 4px 12px rgba(102, 126, 234, 0.1);
+        }
+
+        .member-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 20px;
+        }
+
+        .member-header h3 {
+          font-size: 1.2rem;
+          font-weight: 700;
+          color: #1a202c;
+          margin: 0;
+        }
+
+        .remove-btn {
+          background: #fc8181;
+          color: white;
+          border: none;
+          padding: 8px 16px;
+          border-radius: 8px;
+          font-size: 0.9rem;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          font-family: 'Outfit', sans-serif;
+        }
+
+        .remove-btn:hover {
+          background: #f56565;
+          transform: scale(1.05);
+        }
+
+        .add-member-btn {
+          width: 100%;
+          background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+          border: 2px dashed #667eea;
+          color: #667eea;
+          padding: 16px 24px;
+          border-radius: 12px;
+          font-size: 1.05rem;
+          font-weight: 700;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          margin-bottom: 32px;
+          font-family: 'Outfit', sans-serif;
+        }
+
+        .add-member-btn:hover {
+          background: linear-gradient(135deg, rgba(102, 126, 234, 0.15), rgba(118, 75, 162, 0.15));
+          border-color: #764ba2;
+          color: #764ba2;
+          transform: translateY(-2px);
+        }
+
+        .social-section {
+          margin-top: 32px;
+          padding: 28px;
+          background: linear-gradient(135deg, rgba(102, 126, 234, 0.08), rgba(118, 75, 162, 0.08));
+          border-radius: 16px;
+          text-align: center;
+        }
+
+        .social-section h3 {
+          font-size: 1.3rem;
+          font-weight: 700;
+          color: #1a202c;
+          margin-bottom: 20px;
+        }
+
+        .social-links {
+          display: flex;
+          gap: 16px;
+          justify-content: center;
+          margin-bottom: 16px;
+        }
+
+        .social-link {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          padding: 14px 28px;
+          border-radius: 12px;
+          text-decoration: none;
+          font-weight: 600;
+          font-size: 1.05rem;
+          transition: all 0.3s ease;
+          flex: 1;
+          max-width: 200px;
+          justify-content: center;
+        }
+
+        .social-link.linkedin {
+          background: #0077b5;
+          color: white;
+        }
+
+        .social-link.linkedin:hover {
+          background: #006399;
+          transform: translateY(-3px);
+          box-shadow: 0 8px 16px rgba(0, 119, 181, 0.3);
+        }
+
+        .social-link.instagram {
+          background: linear-gradient(135deg, #833ab4, #fd1d1d, #fcb045);
+          color: white;
+        }
+
+        .social-link.instagram:hover {
+          transform: translateY(-3px);
+          box-shadow: 0 8px 16px rgba(131, 58, 180, 0.4);
+        }
+
+        .social-icon {
+          font-size: 1.3rem;
+        }
+
+        .social-note {
+          font-size: 0.95rem;
+          color: #4a5568;
+          font-style: italic;
+          margin: 0;
+        }
+
+        .contact-section {
+          margin: 32px 0;
+          padding: 28px;
+          background: linear-gradient(135deg, rgba(102, 126, 234, 0.05), rgba(118, 75, 162, 0.05));
+          border-radius: 16px;
+          border: 2px solid rgba(102, 126, 234, 0.15);
+        }
+
+        .contact-section h3 {
+          font-size: 1.3rem;
+          font-weight: 700;
+          color: #1a202c;
+          margin-bottom: 20px;
+          text-align: center;
+        }
+
+        .contact-card {
+          display: flex;
+          align-items: center;
+          gap: 24px;
+          padding: 20px;
+          background: white;
+          border-radius: 16px;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+          transition: all 0.3s ease;
+        }
+
+        .contact-card:hover {
+          transform: translateY(-4px);
+          box-shadow: 0 8px 24px rgba(102, 126, 234, 0.2);
+        }
+
+        .contact-avatar {
+          flex-shrink: 0;
+        }
+
+        .avatar-img {
+          width: 80px;
+          height: 80px;
+          border-radius: 50%;
+          object-fit: cover;
+          border: 3px solid #667eea;
+          box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .contact-info {
+          flex: 1;
+        }
+
+        .contact-info h4 {
+          font-size: 1.2rem;
+          font-weight: 700;
+          color: #1a202c;
+          margin: 0 0 4px 0;
+        }
+
+        .contact-role {
+          font-size: 0.95rem;
+          color: #718096;
+          margin: 0 0 12px 0;
+          font-weight: 500;
+        }
+
+        .contact-links {
+          display: flex;
+          gap: 12px;
+          flex-wrap: wrap;
+        }
+
+        .contact-link {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          padding: 8px 16px;
+          background: linear-gradient(135deg, #667eea, #764ba2);
+          color: white;
+          text-decoration: none;
+          border-radius: 8px;
+          font-size: 0.9rem;
+          font-weight: 600;
+          transition: all 0.3s ease;
+        }
+
+        .contact-link:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .step-title {
+          font-size: 2rem;
+          font-weight: 700;
+          color: #1a202c;
+          margin-bottom: 32px;
+          background: linear-gradient(135deg, #667eea, #764ba2);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+        }
+
+        .fun-subtitle {
+          font-size: 1.1rem;
+          color: #718096;
+          margin-bottom: 32px;
+          font-style: italic;
+        }
+
+        .form-group {
+          margin-bottom: 28px;
+        }
+
+        .form-row {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 20px;
+        }
+
+        label {
+          display: block;
+          font-weight: 600;
+          color: #2d3748;
+          margin-bottom: 10px;
+          font-size: 1rem;
+        }
+
+        .input-field,
+        .textarea-field,
+        .select-field {
+          width: 100%;
+          padding: 14px 18px;
+          border: 2px solid #e2e8f0;
+          border-radius: 12px;
+          font-size: 1rem;
+          font-family: 'Outfit', sans-serif;
+          transition: all 0.3s ease;
+          background: white;
+        }
+
+        .input-field:focus,
+        .textarea-field:focus,
+        .select-field:focus {
+          outline: none;
+          border-color: #667eea;
+          box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .textarea-field {
+          resize: vertical;
+        }
+
+        .checkbox-group,
+        .radio-group {
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+        }
+
+        .checkbox-label,
+        .radio-label {
+          display: flex;
+          align-items: center;
+          padding: 14px 18px;
+          border: 2px solid #e2e8f0;
+          border-radius: 12px;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          font-weight: 500;
+          color: #2d3748;
+        }
+
+        .checkbox-label:hover,
+        .radio-label:hover {
+          border-color: #667eea;
+          background: rgba(102, 126, 234, 0.05);
+        }
+
+        .checkbox-label input,
+        .radio-label input {
+          margin-right: 12px;
+          width: 20px;
+          height: 20px;
+          cursor: pointer;
+        }
+
+        .button-group {
+          display: flex;
+          gap: 16px;
+          margin-top: 40px;
+        }
+
+        .prev-btn,
+        .next-btn,
+        .submit-btn,
+        .big-btn {
+          padding: 14px 32px;
+          border: none;
+          border-radius: 12px;
+          font-size: 1.1rem;
+          font-weight: 700;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          font-family: 'Outfit', sans-serif;
+        }
+
+        .prev-btn {
+          background: #e2e8f0;
+          color: #4a5568;
+          flex: 1;
+        }
+
+        .prev-btn:hover {
+          background: #cbd5e0;
+          transform: translateX(-4px);
+        }
+
+        .next-btn {
+          background: linear-gradient(135deg, #667eea, #764ba2);
+          color: white;
+          flex: 2;
+        }
+
+        .next-btn:hover {
+          transform: translateX(4px);
+          box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4);
+        }
+
+        .submit-btn {
+          background: linear-gradient(135deg, #FFD700, #FFA500);
+          color: #1a202c;
+          flex: 2;
+        }
+
+        .submit-btn:hover {
+          transform: scale(1.05);
+          box-shadow: 0 12px 32px rgba(255, 215, 0, 0.4);
+        }
+
+        .big-btn {
+          width: 100%;
+          padding: 20px 40px;
+          font-size: 1.3rem;
+          background: linear-gradient(135deg, #667eea, #764ba2);
+          color: white;
+          margin-top: 20px;
+        }
+
+        .big-btn:hover {
+          transform: scale(1.03);
+          box-shadow: 0 16px 48px rgba(102, 126, 234, 0.5);
+        }
+
+        .final-note {
+          background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+          padding: 24px;
+          border-radius: 16px;
+          margin: 24px 0;
+          border-left: 4px solid #667eea;
+        }
+
+        .final-note p {
+          margin: 10px 0;
+          color: #2d3748;
+          font-weight: 500;
+          font-size: 1rem;
+        }
+
+        .fun-section {
+          background: linear-gradient(135deg, rgba(240, 147, 251, 0.05), rgba(118, 75, 162, 0.05));
+          padding: 32px;
+          border-radius: 20px;
+          margin: -20px;
+        }
+
+        @media (max-width: 768px) {
+          .form-card {
+            padding: 30px 24px;
+          }
+
+          .main-title {
+            font-size: 2.5rem;
+          }
+
+          .form-row {
+            grid-template-columns: 1fr;
+          }
+
+          .social-links {
+            flex-direction: column;
+          }
+
+          .social-link {
+            max-width: 100%;
+          }
+
+          .contact-card {
+            flex-direction: column;
+            text-align: center;
+          }
+
+          .contact-links {
+            justify-content: center;
+          }
+        }
+      `}</style>
+
+      {step > 0 && (
+        <div className="progress-bar">
+          <div 
+            className="progress-fill" 
+            style={{ width: `${(step / (totalSteps - 1)) * 100}%` }}
+          />
+        </div>
+      )}
+
+      <div className="form-card">
+        {renderStep()}
+      </div>
+    </div>
+  );
+}
