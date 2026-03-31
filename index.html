@@ -1,1 +1,225 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ENVC - VC Day Başvuru Formu</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Outfit', sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%); min-height: 100vh; padding: 20px; }
+    .container { max-width: 700px; margin: 0 auto; }
+    .card { background: white; border-radius: 24px; padding: 40px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); margin-bottom: 20px; }
+    h1 { font-size: 2.5rem; background: linear-gradient(135deg, #667eea, #764ba2); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 20px; }
+    .form-group { margin-bottom: 20px; }
+    label { display: block; font-weight: 600; margin-bottom: 8px; color: #2d3748; }
+    input, textarea, select { width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 8px; font-family: 'Outfit', sans-serif; font-size: 1rem; }
+    input:focus, textarea:focus, select:focus { outline: none; border-color: #667eea; }
+    .btn { background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 14px 32px; border: none; border-radius: 12px; font-size: 1.1rem; font-weight: 700; cursor: pointer; width: 100%; margin-top: 20px; }
+    .btn:hover { transform: scale(1.02); }
+    .team-card { background: #f7fafc; padding: 20px; border-radius: 12px; margin-bottom: 15px; border: 2px solid #e2e8f0; }
+    .add-btn { background: #e2e8f0; color: #4a5568; border: 2px dashed #667eea; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <h1>🚀 ENVC - VC Day</h1>
+      <p style="font-size: 1.1rem; color: #4a5568; margin-bottom: 30px; line-height: 1.6;">
+        <strong>ENVC (Entrepreneur & Venture Capital Society)</strong>, Boğaziçi Üniversitesi bünyesinde kurulan ve founder-VC pipeline'ını kurmayı hedefleyen bir topluluktur. Network oluşturmanın ve know-how aktarımının merkezi olmayı amaçlıyoruz.
+        <br><br>
+        <strong>VC Day</strong>, Nisan sonu - Mayıs başı tarihleri arasında gerçekleşecek özel bir etkinliktir. <strong>212, Revo Capital, E2VC</strong> gibi Türkiye'nin önde gelen VC'leriyle startupları buluşturuyoruz. Pitch sunumları, feedback oturumları ve networking fırsatları sizi bekliyor!
+      </p>
+      <hr style="border: none; border-top: 2px solid #e2e8f0; margin-bottom: 30px;">
+      
+      <div class="form-group">
+        <label>Ad Soyad *</label>
+        <input type="text" id="name" required>
+      </div>
 
+      <div class="form-group">
+        <label>Email *</label>
+        <input type="email" id="email" required>
+      </div>
+
+      <div class="form-group">
+        <label>Telefon *</label>
+        <input type="tel" id="phone" required>
+      </div>
+
+      <div class="form-group">
+        <label>Startup İsmi *</label>
+        <input type="text" id="startup" required>
+      </div>
+
+      <div class="form-group">
+        <label>Website</label>
+        <input type="text" id="website">
+      </div>
+
+      <h3 style="margin: 30px 0 20px;">Ekip Üyeleri</h3>
+      <div id="teamContainer">
+        <div class="team-card">
+          <div class="form-group">
+            <label>Ad Soyad *</label>
+            <input type="text" class="member-name" required>
+          </div>
+          <div class="form-group">
+            <label>Üniversite *</label>
+            <input type="text" class="member-uni" required>
+          </div>
+          <div class="form-group">
+            <label>Bölüm *</label>
+            <input type="text" class="member-dept" required>
+          </div>
+          <div class="form-group">
+            <label>Sınıf *</label>
+            <select class="member-year" required>
+              <option value="">Seç</option>
+              <option value="1">1. Sınıf</option>
+              <option value="2">2. Sınıf</option>
+              <option value="3">3. Sınıf</option>
+              <option value="4">4. Sınıf</option>
+              <option value="Mezun">Mezun</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <button class="btn add-btn" onclick="addMember()">+ Ekip Üyesi Ekle</button>
+
+      <div class="form-group" style="margin-top: 30px;">
+        <label>Hangi problemi çözüyorsun? *</label>
+        <textarea id="problem" rows="4" required></textarea>
+      </div>
+
+      <div class="form-group">
+        <label>Çözümün ne? *</label>
+        <textarea id="solution" rows="4" required></textarea>
+      </div>
+
+      <div class="form-group">
+        <label>Aşama *</label>
+        <select id="stage" required>
+          <option value="">Seç</option>
+          <option value="Idea">Idea</option>
+          <option value="MVP">MVP</option>
+          <option value="Pre-seed">Pre-seed</option>
+          <option value="Seed">Seed</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Pitch Deck Link *</label>
+        <input type="url" id="pitch" required>
+      </div>
+
+      <div class="form-group">
+        <label>Bizi nereden duydun?</label>
+        <input type="text" id="source">
+      </div>
+
+      <div class="form-group">
+        <label>Eklemek istediğin notlar</label>
+        <textarea id="notes" rows="3"></textarea>
+      </div>
+
+      <button class="btn" onclick="submitForm()">Başvuruyu Gönder 🚀</button>
+    </div>
+
+    <div class="card" style="text-align: center; padding: 30px;">
+      <h3 style="margin-bottom: 20px; color: #2d3748;">📞 Sorularınız mı var?</h3>
+      <p style="color: #4a5568; margin-bottom: 20px;">
+        <strong>Miray İpek</strong> - ENVC Ekibi<br>
+        <a href="mailto:miray.ipek@std.bogazici.edu.tr" style="color: #667eea; text-decoration: none;">miray.ipek@std.bogazici.edu.tr</a>
+      </p>
+      <div style="display: flex; gap: 15px; justify-content: center; margin-top: 25px;">
+        <a href="https://www.linkedin.com/in/mirayipek/" target="_blank" style="background: #0077b5; color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: 600;">
+          🔗 LinkedIn
+        </a>
+        <a href="https://www.instagram.com/envc.boun/" target="_blank" style="background: linear-gradient(135deg, #833ab4, #fd1d1d); color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: 600;">
+          📸 Instagram
+        </a>
+        <a href="https://www.linkedin.com/company/envc-entrepreneurship-vc-community/" target="_blank" style="background: #0077b5; color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: 600;">
+          🏢 ENVC LinkedIn
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function addMember() {
+      const container = document.getElementById('teamContainer');
+      const div = document.createElement('div');
+      div.className = 'team-card';
+      div.innerHTML = `
+        <div class="form-group">
+          <label>Ad Soyad *</label>
+          <input type="text" class="member-name" required>
+        </div>
+        <div class="form-group">
+          <label>Üniversite *</label>
+          <input type="text" class="member-uni" required>
+        </div>
+        <div class="form-group">
+          <label>Bölüm *</label>
+          <input type="text" class="member-dept" required>
+        </div>
+        <div class="form-group">
+          <label>Sınıf *</label>
+          <select class="member-year" required>
+            <option value="">Seç</option>
+            <option value="1">1. Sınıf</option>
+            <option value="2">2. Sınıf</option>
+            <option value="3">3. Sınıf</option>
+            <option value="4">4. Sınıf</option>
+            <option value="Mezun">Mezun</option>
+          </select>
+        </div>
+      `;
+      container.appendChild(div);
+    }
+
+    async function submitForm() {
+      const teamMembers = [];
+      const cards = document.querySelectorAll('.team-card');
+      cards.forEach(card => {
+        teamMembers.push({
+          name: card.querySelector('.member-name').value,
+          university: card.querySelector('.member-uni').value,
+          department: card.querySelector('.member-dept').value,
+          year: card.querySelector('.member-year').value
+        });
+      });
+
+      const data = {
+        timestamp: new Date().toISOString(),
+        founderName: document.getElementById('name').value,
+        email: document.getElementById('email').value,
+        phone: document.getElementById('phone').value,
+        startupName: document.getElementById('startup').value,
+        website: document.getElementById('website').value,
+        teamMembers: teamMembers,
+        problemStatement: document.getElementById('problem').value,
+        solution: document.getElementById('solution').value,
+        stage: document.getElementById('stage').value,
+        pitchDeck: document.getElementById('pitch').value,
+        howHeard: document.getElementById('source').value,
+        anythingElse: document.getElementById('notes').value
+      };
+
+      try {
+        await fetch('https://script.google.com/macros/s/AKfycbzXQ9cqO6qwZPHGpm1pzqWe7sz5A3cbJ2EXtxczupobloYDQt-9ms0fMbYHuiao6MMf/exec', {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+        alert('Başvurunuz gönderildi! 🚀');
+        location.reload();
+      } catch(e) {
+        alert('Hata oluştu. Lütfen tekrar deneyin.');
+      }
+    }
+  </script>
+</body>
+</html>
